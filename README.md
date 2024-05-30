@@ -4,7 +4,8 @@ A project that uses image identification and neural networks to classify common 
 
 This project uses the next dataset
 
-Alistair King, www.kaggle.com/datasets/alistairking/recyclable-and-household-waste-classificationTo download the dataset put your credentials on your workspace (kaggle.json) and run dwDataset.py
+Alistair King, www.kaggle.com/datasets/alistairking/recyclable-and-household-waste-classification
 
 
-To download the dataset put yout credentials (kaggle.json) on the workspace and run dwDataset.py
+
+To download the dataset run dwDataset and enter your kaggle credentials to authorize downloading
