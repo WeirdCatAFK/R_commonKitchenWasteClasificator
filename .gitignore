@@ -1,3 +1,6 @@
 recyclable-and-household-waste-classification/
 training_data/
-dataframe.rds
+training_dataframe.rds
+prediction_dataframe.rds
+test.r
+test.py
