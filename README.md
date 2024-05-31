@@ -8,7 +8,7 @@ Alistair King, www.kaggle.com/datasets/alistairking/recyclable-and-household-was
 
 # Try the project
 
-1.-To get the data run the image_manager.py file to get the dataset of this project
+1.-To get the data run the image_manager.py with your kraggle.json credentials to get the dataset of this project 
 
 2.-To continue, well have to create an R dataframe so run dataframe_creator.r to create it. It will create two dataframes, one called training_dataframe.rds, and another one called prediction_dataframe.rds. These dataframes will be used later
 
