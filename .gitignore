@@ -4,3 +4,4 @@ training_dataframe.rds
 prediction_dataframe.rds
 test.r
 test.py
+.Rhistory

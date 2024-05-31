@@ -37,17 +37,41 @@ extract_image_data <- function(image_path) {
     list(luminance = luminance_matrix, r = r_matrix, g = g_matrix, b = b_matrix)
 }
 
-# Función para convertir matrices a vectores numéricos
-convert_to_numeric_vector <- function(matrix, size = 32 * 32) {
-    vector <- as.vector(matrix)
-    # Ajustar el tamaño del vector si es necesario
-    if (length(vector) < size) {
-        vector <- c(vector, rep(0, size - length(vector)))
-    } else if (length(vector) > size) {
-        vector <- vector[1:size]
+# Función para calcular el umbral de Otsu adaptado al rango [0, 1]
+otsu_thresholding <- function(matrix) {
+    hist_data <- hist(matrix, plot = FALSE, breaks = seq(0, 1, length.out = 257)) # 256 bins for [0, 1]
+    counts <- hist_data$counts
+    bins <- hist_data$mids
+
+    total <- sum(counts)
+    sumB <- 0
+    wB <- 0
+    maximum <- 0.0
+    sum1 <- sum(bins * counts)
+    for (i in 1:length(counts)) {
+        wB <- wB + counts[i]
+        wF <- total - wB
+        if (wB == 0 || wF == 0) {
+            next
+        }
+        sumB <- sumB + bins[i] * counts[i]
+        mB <- sumB / wB
+        mF <- (sum1 - sumB) / wF
+        between <- wB * wF * (mB - mF) * (mB - mF)
+        if (between > maximum) {
+            level <- bins[i]
+            maximum <- between
+        }
     }
-    vector
+    return(level)
 }
+
+# Función para convertir matrices a vectores binarios usando el umbral de Otsu
+convert_to_binary_vector <- function(matrix) {
+    threshold <- otsu_thresholding(matrix)
+    as.integer(c(matrix > threshold))
+}
+
 
 # Función para procesar las imágenes en una carpeta
 process_images <- function(folder_path, label) {
@@ -63,20 +87,20 @@ process_images <- function(folder_path, label) {
         print(paste("Procesando imagen:", image_file))
         image_data <- extract_image_data(image_file)
 
-        # Convertir las matrices de luminancia, R, G y B a vectores numéricos
-        luminance_vector <- convert_to_numeric_vector(image_data$luminance)
-        r_vector <- convert_to_numeric_vector(image_data$r)
-        g_vector <- convert_to_numeric_vector(image_data$g)
-        b_vector <- convert_to_numeric_vector(image_data$b)
+        # Convertir las matrices de luminancia, R, G y B a vectores binarios usando Otsu
+        luminance_vector <- convert_to_binary_vector(image_data$luminance)
+        r_vector <- convert_to_binary_vector(image_data$r)
+        g_vector <- convert_to_binary_vector(image_data$g)
+        b_vector <- convert_to_binary_vector(image_data$b)
 
         # Crear un dataframe temporal con los datos de la imagen
         temp_df <- data.frame(
             file = basename(image_file),
             label = label,
-            luminance_vector = I(list(luminance_vector)),
-            r_vector = I(list(r_vector)),
-            g_vector = I(list(g_vector)),
-            b_vector = I(list(b_vector))
+            luminance_vector = (c(luminance_vector)),
+            r_vector = (c(r_vector)),
+            g_vector = (c(g_vector)),
+            b_vector = (c(b_vector))
         )
 
         # Agregar el dataframe temporal al dataframe principal
@@ -95,14 +119,6 @@ cardboard_df <- process_images(cardboard_path, "cardboard")
 # Combinar ambos dataframes
 print("Combinando dataframes...")
 final_df <- bind_rows(aluminum_df, cardboard_df)
-
-# Asegurar que todos los vectores tengan el mismo tamaño
-vector_size <- 32 * 32
-
-final_df$luminance_vector <- lapply(final_df$luminance_vector, function(x) convert_to_numeric_vector(x, vector_size))
-final_df$r_vector <- lapply(final_df$r_vector, function(x) convert_to_numeric_vector(x, vector_size))
-final_df$g_vector <- lapply(final_df$g_vector, function(x) convert_to_numeric_vector(x, vector_size))
-final_df$b_vector <- lapply(final_df$b_vector, function(x) convert_to_numeric_vector(x, vector_size))
 
 # Dividir el dataframe en 75% entrenamiento y 25% predicción
 set.seed(123) # Fijar la semilla para reproducibilidad
