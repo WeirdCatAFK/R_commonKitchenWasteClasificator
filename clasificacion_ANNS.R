@@ -1,13 +1,13 @@
 library(tidyverse)
 library(neuralnet)
 
-# Read training data
+# Leer los datos de entrenamiento
 training_df <- readRDS("training_dataframe.rds")
 
-# Convert label to binary encoding: aluminum = 0, cardboard = 1
+# Convertir la etiqueta a codificación binaria: aluminio = 0, cartón = 1
 training_df$label <- ifelse(training_df$label == "aluminum", 0, 1)
 
-print("Making model")
+print("Creando el modelo")
 model <- neuralnet(
   label ~ luminance_vector + r_vector + g_vector + b_vector,
   data = training_df,
@@ -15,14 +15,30 @@ model <- neuralnet(
   linear.output = FALSE
 )
 
-# Read prediction data
+# Leer los datos de predicción
 prediction_df <- readRDS("prediction_dataframe.rds")
 
-print("Making predictions with the new data")
+print("Haciendo predicciones con los nuevos datos")
 predictions <- predict(model, newdata = prediction_df)
 
-# Convert predictions back to original labels
+# Convertir las predicciones a etiquetas originales
 predicted_labels <- ifelse(predictions <= 0.5, "aluminum", "cardboard")
 
-# Display the first 10 predictions
-head(predicted_labels)
+# Leer los datos de prueba con las etiquetas reales
+test_df <- readRDS("test_dataframe.rds")
+
+# Comparar las predicciones con las etiquetas reales
+comparison <- data.frame(
+  predicted = predicted_labels,
+  actual = test_df$label
+)
+
+# Calcular el porcentaje de predicciones correctas
+success_rate <- sum(comparison$predicted == comparison$actual) / nrow(comparison) * 100
+
+# Crear un gráfico de pastel
+pie_data <- table(comparison$predicted == comparison$actual)
+labels <- c("Predicciones Correctas", "Predicciones Erróneas")
+colors <- c("green", "red")
+
+pie(pie_data, labels = labels, col = colors, main = paste("Porcentaje de Predicciones Exitosas: ", success_rate, "%"))
