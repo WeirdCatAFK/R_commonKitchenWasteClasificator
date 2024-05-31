@@ -1,4 +1,3 @@
-
 # Instalar las librerías si no están instaladas
 if (!require(imager)) {
     print("Instalando la librería 'imager'...")

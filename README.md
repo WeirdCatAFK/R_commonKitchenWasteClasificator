@@ -8,6 +8,6 @@ Alistair King, www.kaggle.com/datasets/alistairking/recyclable-and-household-was
 
 # Try the project
 
-1.-To get the data run the imageManager.py file to get the dataset of this project
+1.-To get the data run the image_manager.py file to get the dataset of this project
 
-2.-To continue, well have to create an R dataframe so run dfCreator.r to create it (it will create an rds file called )
+2.-To continue, well have to create an R dataframe so run dataframe_creator.r to create it (it will create an rds file called )
