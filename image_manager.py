@@ -3,9 +3,17 @@ import shutil
 import opendatasets as od
 
 dataset = "https://www.kaggle.com/datasets/alistairking/recyclable-and-household-waste-classification/data"
+dataset_dir = "recyclable-and-household-waste-classification"
 
-od.download(dataset)
+# Function to download the dataset if not already downloaded
+def download_dataset(dataset_url, dataset_path):
+    if not os.path.exists(dataset_path):
+        print("Downloading dataset...")
+        od.download(dataset_url)
+    else:
+        print("Dataset already downloaded.")
 
+download_dataset(dataset, dataset_dir)
 
 def copy_images_with_enumeration_from_folders(src_dirs, dst_dir):
     # Crear el directorio de destino si no existe
@@ -23,15 +31,19 @@ def copy_images_with_enumeration_from_folders(src_dirs, dst_dir):
         for filename in files:
             src_path = os.path.join(src_dir, filename)
             dst_path = os.path.join(dst_dir, f"Image_{current_index}.png")
-            shutil.copyfile(src_path, dst_path)
-            current_index += 1  # Incrementar el índice para la próxima imagen
-
+            try:
+                shutil.copyfile(src_path, dst_path)
+                current_index += 1  # Incrementar el índice para la próxima imagen
+            except PermissionError as e:
+                print(f"PermissionError: {e}")
+            except Exception as e:
+                print(f"Error copying file {src_path} to {dst_path}: {e}")
 
 aluminum = [
     "recyclable-and-household-waste-classification/images/images/aluminum_food_cans/default",
     "recyclable-and-household-waste-classification/images/images/aluminum_food_cans/real_world",
-    "recyclable-and-household-waste-classification/images/images/aluminum_soda_cans",
-    "recyclable-and-household-waste-classification/images/images/aluminum_soda_cans",
+    "recyclable-and-household-waste-classification/images/images/aluminum_soda_cans/default",
+    "recyclable-and-household-waste-classification/images/images/aluminum_soda_cans/real_world",
 ]
 aluminum_output = "training_data/aluminum"
 
@@ -43,4 +55,4 @@ cardboard = [
 ]
 cardboard_output = "training_data/cardboard"
 
-copy_images_with_enumeration_from_folders(aluminum, aluminum_output)
+copy_images_with_enumeration_from_folders(cardboard, cardboard_output)

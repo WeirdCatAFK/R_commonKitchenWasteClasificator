@@ -24,7 +24,7 @@ extract_image_data <- function(image_path) {
     img <- load.image(image_path)
 
     # Redimensionar la imagen a 16x16
-    img_resized <- imager::resize(img, 64, 64)
+    img_resized <- imager::resize(img, 32, 32)
 
     # Obtener las matrices de color de canal
     r_matrix <- as.matrix(R(img_resized))

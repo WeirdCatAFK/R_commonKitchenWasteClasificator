@@ -1,5 +1,8 @@
+install.packages("ggplot")
+
 library(tidyverse)
 library(neuralnet)
+library(ggplot)
 
 # Check if required libraries are installed
 stopifnot(requireNamespace("tidyverse", quietly = TRUE))
@@ -51,9 +54,11 @@ model <- tryCatch({
   neuralnet(
     label ~ luminance_vector + r_vector + g_vector + b_vector,
     data = training_df,
-    hidden = 3,
+    hidden = 5,
+    err.fct = 'ce',
     act.fct = "logistic",
-    linear.output = FALSE
+    linear.output = FALSE,
+    likelihood = TRUE
   )
 }, error = function(e) {
   cat("Error creating the model:\n")
@@ -80,7 +85,7 @@ if (!is.null(model)) {
   predictions <- compute(trained_model, prediction_input)
   
   # Get predicted labels
-  predicted_labels <- ifelse(predictions$net.result <= 0.5, "aluminum", "cardboard")
+  predicted_labels <- ifelse(predictions$net.result <= 0.5, "aluminum", "carton")
   
   comparison <- data.frame(
     predicted = predicted_labels,
@@ -88,11 +93,21 @@ if (!is.null(model)) {
   )
   
   success_rate <- sum(comparison$predicted == comparison$actual) / nrow(comparison) * 100
-  windows()
-  cat("Creating a pie chart\n")
-  pie_data <- table(comparison$predicted == comparison$actual)
-  labels <- c("Predictions Correct", "Predictions Incorrect")
-  colors <- c("green", "red")
+  cat("Success rate: ", success_rate, "%\n")
   
-  pie(pie_data, labels = labels, col = colors, main = paste("Prediction Success Rate: ", success_rate, "%"))
+  # Create a line plot comparing the original labels and predictions
+  comparison <- comparison %>%
+    mutate(index = row_number())
+  
+  comparison_plot <- comparison %>%
+    pivot_longer(cols = c(predicted, actual), names_to = "type", values_to = "label") %>%
+    mutate(label = factor(label, levels = c("aluminum", "cardboard")))
+  
+  ggplot(comparison_plot, aes(x = index, y = label, color = type, group = type)) +
+    geom_line() +
+    labs(title = paste("Prediction vs Actual Labels (Success Rate:", round(success_rate, 2), "%)"),
+         x = "Index",
+         y = "Label",
+         color = "Type") +
+    theme_minimal()
 }
