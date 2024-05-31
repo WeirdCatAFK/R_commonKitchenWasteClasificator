@@ -74,9 +74,9 @@ process_images <- function(folder_path, label) {
             file = basename(image_file),
             label = label,
             luminance_vector = I(list(luminance_vector)),
-            r_vector = I(list(r_vector)),
-            g_vector = I(list(g_vector)),
-            b_vector = I(list(b_vector))
+            r_vector = ((r_vector)),
+            g_vector = ((g_vector)),
+            b_vector = ((b_vector))
         )
 
         # Agregar el dataframe temporal al dataframe principal

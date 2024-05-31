@@ -24,7 +24,7 @@ extract_image_data <- function(image_path) {
     img <- load.image(image_path)
 
     # Redimensionar la imagen a 16x16
-    img_resized <- imager::resize(img, 16, 16)
+    img_resized <- imager::resize(img, 64, 64)
 
     # Obtener las matrices de color de canal
     r_matrix <- as.matrix(R(img_resized))
@@ -121,7 +121,7 @@ print("Combinando dataframes...")
 final_df <- bind_rows(aluminum_df, cardboard_df)
 
 # Dividir el dataframe en 75% entrenamiento y 25% predicción
-set.seed(123) # Fijar la semilla para reproducibilidad
+set.seed(170304) # Fijar la semilla para reproducibilidad
 train_indices <- sample(seq_len(nrow(final_df)), size = 0.75 * nrow(final_df))
 training_df <- final_df[train_indices, ]
 prediction_df <- final_df[-train_indices, ]
