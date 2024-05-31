@@ -15,11 +15,15 @@ model <- neuralnet(
   linear.output = FALSE
 )
 
+print("Entrenando el modelo")
+trained_model <- train(model)
+
 # Leer los datos de predicción
 prediction_df <- readRDS("prediction_dataframe.rds")
 
+
 print("Haciendo predicciones con los nuevos datos")
-predictions <- predict(model, newdata = prediction_df)
+predictions <- predict(trained_model, newdata = prediction_df)
 
 # Convertir las predicciones a etiquetas originales
 predicted_labels <- ifelse(predictions <= 0.5, "aluminum", "cardboard")
