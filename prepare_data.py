@@ -52,3 +52,4 @@ cardboard = [
 cardboard_output = "training_data/cardboard"
 
 copy_images_with_enumeration_from_folders(cardboard, cardboard_output)
+copy_images_with_enumeration_from_folders(aluminum, aluminum_output)
