@@ -37,40 +37,7 @@ extract_image_data <- function(image_path) {
     list(luminance = luminance_matrix, r = r_matrix, g = g_matrix, b = b_matrix)
 }
 
-# Función para calcular el umbral de Otsu adaptado al rango [0, 1]
-otsu_thresholding <- function(matrix) {
-    hist_data <- hist(matrix, plot = FALSE, breaks = seq(0, 1, length.out = 257)) # 256 bins for [0, 1]
-    counts <- hist_data$counts
-    bins <- hist_data$mids
 
-    total <- sum(counts)
-    sumB <- 0
-    wB <- 0
-    maximum <- 0.0
-    sum1 <- sum(bins * counts)
-    for (i in 1:length(counts)) {
-        wB <- wB + counts[i]
-        wF <- total - wB
-        if (wB == 0 || wF == 0) {
-            next
-        }
-        sumB <- sumB + bins[i] * counts[i]
-        mB <- sumB / wB
-        mF <- (sum1 - sumB) / wF
-        between <- wB * wF * (mB - mF) * (mB - mF)
-        if (between > maximum) {
-            level <- bins[i]
-            maximum <- between
-        }
-    }
-    return(level)
-}
-
-# Función para convertir matrices a vectores binarios usando el umbral de Otsu
-convert_to_binary_vector <- function(matrix) {
-    threshold <- otsu_thresholding(matrix)
-    as.integer(c(matrix > threshold))
-}
 
 
 # Función para procesar las imágenes en una carpeta
@@ -88,10 +55,10 @@ process_images <- function(folder_path, label) {
         image_data <- extract_image_data(image_file)
 
         # Convertir las matrices de luminancia, R, G y B a vectores binarios usando Otsu
-        luminance_vector <- convert_to_binary_vector(image_data$luminance)
-        r_vector <- convert_to_binary_vector(image_data$r)
-        g_vector <- convert_to_binary_vector(image_data$g)
-        b_vector <- convert_to_binary_vector(image_data$b)
+        luminance_vector <- (image_data$luminance)
+        r_vector <- (image_data$r)
+        g_vector <- (image_data$g)
+        b_vector <- (image_data$b)
 
         # Crear un dataframe temporal con los datos de la imagen
         temp_df <- data.frame(
