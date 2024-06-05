@@ -11,12 +11,10 @@ if (!require(pROC)) {
   install.packages("pROC", dependencies = TRUE)
 }
 
-# Check if required libraries are installed
 stopifnot(requireNamespace("tidyverse", quietly = TRUE))
 stopifnot(requireNamespace("neuralnet", quietly = TRUE))
 stopifnot(requireNamespace("pROC", quietly = TRUE))
 
-# Load data
 training_df <- readRDS("training_dataframe.rds")
 test_df <- readRDS("test_dataframe.rds")
 
@@ -32,18 +30,15 @@ if (all(c("luminance_vector", "r_vector", "g_vector", "b_vector", "label") %in% 
   stop("Test dataframe is missing required columns.\n")
 }
 
-# Convert the label to binary coding: aluminum = 0, cardboard = 1
 training_df$label <- as.numeric(factor(training_df$label, levels = c("aluminum", "cardboard"), labels = c(0, 1)))
 test_df$label     <- as.numeric(factor(test_df$label, levels = c("aluminum", "cardboard"), labels = c(0, 1)))
 
-# Ensure all vectors are numeric
 training_df <- training_df %>%
   mutate(across(c(luminance_vector, r_vector, g_vector, b_vector), as.numeric))
 
 test_df <- test_df %>%
   mutate(across(c(luminance_vector, r_vector, g_vector, b_vector), as.numeric))
 
-# Remove any NA values
 training_df <- na.omit(training_df)
 test_df <- na.omit(test_df)
 
@@ -53,10 +48,11 @@ model <- tryCatch(
     neuralnet(
       label ~ luminance_vector + r_vector + g_vector + b_vector,
       data = training_df,
-      hidden = c(40, 40, 40, 40),
+      hidden = c(50, 25, 10),
       act.fct = "logistic",
       linear.output = FALSE,
-      likelihood = TRUE
+      likelihood = TRUE,
+      rep = 2
     )
   },
   error = function(e) {
@@ -77,19 +73,15 @@ if (!is.null(model)) {
   
   predictions <- compute(model, test_input)
   
-  # Convert predictions to binary labels
   predicted_labels <- ifelse(predictions$net.result > 0.5, 1, 0)
   
-  # Confusion matrix
   actual_labels <- test_df$label
   confusion_matrix <- table(Predicted = predicted_labels, Actual = actual_labels)
   print(confusion_matrix)
   
-  # Convert labels back to original categorical values
   predicted_labels_categorical <- factor(predicted_labels, levels = c(0, 1), labels = c("aluminum", "cardboard"))
   actual_labels_categorical <- factor(actual_labels, levels = c(0, 1), labels = c("aluminum", "cardboard"))
   
-  # Plot ROC curve
   roc_obj <- roc(actual_labels, predictions$net.result)
   auc_value <- auc(roc_obj)
   

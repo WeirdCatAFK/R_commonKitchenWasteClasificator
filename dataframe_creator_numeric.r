@@ -96,6 +96,7 @@ training_df <- final_df[train_indices, ]
 test_indices <- sample(seq_len(nrow(final_df)), size = 0.25 * nrow(final_df))
 test_df <- final_df[test_indices, ]
 
+
 # Guardar los dataframes en archivos separados
 output_path_train <- "training_dataframe.rds"
 output_path_pred <- "test_dataframe.rds"
