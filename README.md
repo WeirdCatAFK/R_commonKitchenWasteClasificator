@@ -1,4 +1,4 @@
-# R_finalProject
+# R_image clasificator
 
 A project that uses image identification and neural networks to classify common kitchen waste onto the categories aluminum or cardboard , trained on a public dataset
 
